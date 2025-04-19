@@ -5,10 +5,6 @@
 #include "fileutil.h"
 
 // DIRECTIONS
-// Choose whether you are doing the 2D array or
-// the array of arrays.
-// For the 2D array,
-//    implement loadFile2D, substringSearch2D, and free2D.
 // For the array of arrays, 
 //    implement loadFileAA, substringSearchAA, and freeAA.
 
@@ -28,66 +24,57 @@ char ** loadFileAA(char *filename, int *size)
 	
 	// TODO
 	// Allocate memory for an array of strings (arr).
+	int capacity = 10;
+	int count = 0;
+	char ** array = malloc(capacity * sizeof(char *));
 	// Read the file line by line.
-    //   Trim newline.
-	//   Expand array if necessary (realloc).
-	//   Allocate memory for the string (str).
-	//   Copy each line into the string (use strcpy).
-	//   Attach the string to the large array (assignment =).
+	char line[255];
+    while(fgets(line, 255, in) != NULL) {
+		//   Trim newline.
+        line[strcspn(line, "\n")] = 0;
+		//   Expand array if necessary (realloc).
+		if (count == capacity) {
+			capacity *= 2;
+			array = realloc(array, capacity * sizeof(char *));
+		}
+		//   Allocate memory for the string (str).
+		array[count] = malloc(strlen(line)+1); //+1 was to fix issue with not including \0
+		//   Copy each line into the string (use strcpy).
+		strcpy(array[count], line);
+		count++;
+	}
     // Close the file.
+	fclose(in);
 	
 	// The size should be the number of entries in the array.
-	*size = 0;
+	*size = count;
 	
 	// Return pointer to the array of strings.
-	return NULL;
+	return array;
 }
 
-char (*loadFile2D(char *filename, int *size))[COLS]
-{
-	FILE *in = fopen(filename, "r");
-	if (!in)
-	{
-	    perror("Can't open file");
-	    exit(1);
-	}
-	
-	// TODO
-	// Allocate memory for an 2D array, using COLS as the width.
-	// Read the file line by line into a buffer.
-    //   Trim newline.
-	//   Expand array if necessary (realloc).
-	//   Copy each line from the buffer into the array (use strcpy).
-    // Close the file.
-	
-	// The size should be the number of entries in the array.
-	*size = 0;
-	
-	// Return pointer to the array.
-	return NULL;
-}
 
 // Search the array for the target string.
 // Return the found string or NULL if not found.
 char * substringSearchAA(char *target, char **lines, int size)
 {
-
+	int count = 0;
+	while (count < size) {
+		char *result = strstr(lines[count], target);
+		if (result) {
+			//return target;
+			return lines[count]; //This version is more fun because you get to see the line it came from in the story
+		}
+		count++;
+	}
 	return NULL;
-}
-
-char * substringSearch2D(char *target, char (*lines)[COLS], int size)
-{
-    
-    return NULL;
 }
 
 // Free the memory used by the array
 void freeAA(char ** arr, int size)
 {
-
-}
-
-void free2D(char (*arr)[COLS])
-{
-
+	for (int i = 0; i < size; i++) {
+		free(arr[i]);
+	}
+	free(arr);
 }
